@@ -1,4 +1,4 @@
-source aws_credentials.sh
+#!/bin/bash
 
 STACK_NAME=awsbootstrap
 REGION=us-east-1
@@ -16,7 +16,7 @@ CODEPIPELINE_BUCKET="$STACK_NAME-$REGION-codepipeline-$AWS_ACCOUNT_ID"
 Echo $CODEPIPELINE_BUCKET
 
 # Deploys static resources
-echo "\n\n=========== Deploying setup.yml ==========="
+echo -e "\n\n=========== Deploying setup.yml ==========="
 aws cloudformation deploy \
   --region $REGION \
   --profile $CLI_PROFILE \
@@ -27,7 +27,7 @@ aws cloudformation deploy \
   --parameter-overrides CodePipelineBucket=$CODEPIPELINE_BUCKET
 
 # Deploy the CloudFormation template
-echo "\n\n=========== Deploying main.yml ==========="
+echo -e "\n\n=========== Deploying main.yml ==========="
 aws cloudformation deploy \
   --region $REGION \
   --profile $CLI_PROFILE \
@@ -42,9 +42,9 @@ aws cloudformation deploy \
     GitHubPersonalAccessToken=$GH_ACCESS_TOKEN \
     CodePipelineBucket=$CODEPIPELINE_BUCKET
 
-    # If the deploy succeeded, show the DNS name of the created instance
+# If the deploy succeeded, show the DNS name of the created instance
 if [ $? -eq 0 ]; then
   aws cloudformation list-exports \
     --profile awsbootstrap \
-    --query "Exports[?Name=='InstanceEndpoint'].Value"
+    --query "Exports[?starts_with(Name,'InstanceEndpoint')].Value"
 fi
